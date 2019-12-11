@@ -1,0 +1,87 @@
+prowjob_namespace: default
+pod_namespace: test-pods
+log_level: debug
+
+sinker:
+  resync_period: 1m
+  max_prowjob_age: 48h
+  max_pod_age: 24h
+
+plank:
+  job_url_prefix_config:
+    '*': https://prow.ciscoai.dev/view/gcs/
+  max_concurrency: 1
+  default_decoration_configs:
+    '*':
+      timeout: 7200000000000 # 2h
+      grace_period: 15000000000 # 15s
+      utility_images:
+        clonerefs: "gcr.io/k8s-prow/clonerefs:v20191204-d7993c80e"
+        initupload: "gcr.io/k8s-prow/initupload:v20191204-d7993c80e"
+        entrypoint: "gcr.io/k8s-prow/entrypoint:v20191204-d7993c80e"
+        sidecar: "gcr.io/k8s-prow/sidecar:v20191204-d7993c80e"
+      gcs_configuration:
+          bucket: "ciscoai-prow"
+          path_strategy: "explicit"
+      gcs_credentials_secret: "gcs-credentials"
+
+deck:
+  spyglass:
+    size_limit: 500000000 # 500MB
+    gcs_browser_prefix: https://console.cloud.google.com/storage/browser/
+    lenses:
+      - lens:
+          name: metadata
+        required_files:
+          - started.json|finished.json
+      - lens:
+          name: buildlog
+        required_files:
+          - build-log.txt
+      - lens:
+          name: junit
+        required_files:
+          - artifacts/junit.*\.xml
+    announcement: "The old job viewer, Gubernator, has been deprecated in favour of this page, Spyglass.{{if .ArtifactPath}} For now, the old page is <a href='https://gubernator-internal.googleplex.com/build/{{.ArtifactPath}}'>still available</a>.{{end}} Please send feedback to osp-engprod@google.com."
+  rerun_auth_config:
+    github_orgs:
+    - CiscoAI
+
+tide:
+  queries:
+  - repos:
+    - CiscoAI/kubeflow-scanner
+    labels:
+    - lgtm
+    - approved
+    missingLabels:
+    - do-not-merge
+    - do-not-merge/hold
+    - do-not-merge/invalid-owners-file
+    - do-not-merge/work-in-progress
+  merge_method:
+    CiscoAI/kubeflow-scanner: squash
+    #target_url: https://prow.ciscoai.dev/tide
+
+presets:
+  - labels:
+      created-by-prow: "true"
+    env:
+    - name: HTTP_PROXY
+      value: http://lab-proxy.ci.ciscolabs.com:3128
+    volumes:
+    - name: http-proxy
+      emptyDir: {}
+    volumeMounts:
+    - name: http-proxy
+      mountPath: /etc/http-proxy
+      readOnly: true
+    - name: HTTPS_PROXY
+      value: https://lab-proxy.ci.ciscolabs.com:3128
+    volumes:
+    - name: https-proxy
+      emptyDir: {}
+    volumeMounts:
+    - name: https-proxy
+      mountPath: /etc/https-proxy
+      readOnly: true

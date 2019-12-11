@@ -1,0 +1,28 @@
+periodics:
+
+- name: kubeflow-periodics
+  interval: 30m # Retest at most 1 PR per 30m
+  decorate: true
+  always_run: true
+  max_concurrency: 5
+  spec:
+    containers:
+    - image: alpine
+      command:
+      - "/bin/date"
+
+presubmits:
+
+  CiscoAI/kubeflow:
+  - name: kubeflow-presubmits
+    interval: 30m # Retest at most 1 PR per 30m
+    decorate: true
+    always_run: true
+    max_concurrency: 5
+    branches:
+    - ^master$
+    spec:
+      containers:
+      - image: alpine
+        command:
+        - "/bin/date"

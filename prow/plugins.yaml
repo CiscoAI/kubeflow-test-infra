@@ -1,0 +1,49 @@
+---
+triggers:
+- repos:
+  - CiscoAI/kubeflow
+  - CiscoAI/kubeflow-test-infra
+  - CiscoAI/kubeflow-scanner
+  only_org_members: true
+
+blunderbuss:
+  request_count: 1
+
+
+config_updater:
+  maps:
+    prow/config.yaml:
+      name: config
+    prow/plugins.yaml:
+      name: plugins
+    prow/prowjobs/**/*.yaml:
+      name: job-config
+
+plugins:
+  CiscoAI:
+  # Enable /approve and /assign commands.
+    - approve
+    - assign
+    - blunderbuss
+    - help
+    - hold
+    - label
+    - lgtm
+    # Lets PRs & issues be flagged as stale
+    - lifecycle
+    - size
+    # Allows cleaning up stale commit statuses
+    - skip
+    - verify-owners
+    # Applies a label to PRs with wip in the title to block merge
+    - wip
+  CiscoAI/kubeflow-scanner:
+    - trigger
+    - goose
+    - shrug
+    - dog
+    - cat
+  CiscoAI/kubeflow:
+    - trigger
+  CiscoAI/kubeflow-test-infra:
+    - trigger
