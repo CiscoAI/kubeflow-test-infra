@@ -1,20 +1,10 @@
-periodics:
-
-- name: scanner-periodic-tests
-  interval: 30m # Retest at most 1 PR per 30m
-  decorate: true
-  always_run: true
-  max_concurrency: 5
-  spec:
-    containers:
-    - image: alpine
-      command:
-      - "/bin/date"
-
+# periodics:
+#
 presubmits:
 
   CiscoAI/kubeflow-scanner:
   - name: presubmit-scanner
+    cluster: build
     interval: 30m # Retest at most 1 PR per 30m
     decorate: true
     always_run: true
@@ -25,6 +15,5 @@ presubmits:
     - ^master$
     spec:
       containers:
-      - image: alpine
-        command:
-        - "/bin/date"
+      - image: ciscoai/kubeflow-scanner-ci:latest
+        imagePullPolicy: Always

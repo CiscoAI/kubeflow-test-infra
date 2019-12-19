@@ -1,0 +1,15 @@
+periodics:
+
+- name: kubeflow-periodic-0-7-branch
+  branches:
+  - v0.7-branch
+  cluster: build
+  interval: 8h
+  decorate: true
+  always_run: true
+  max_concurrency: 2
+  spec:
+    containers:
+    - image: ciscoai/kubeflow-ci:latest
+      imagePullPolicy: Always
+# presubmits:

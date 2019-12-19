@@ -1,0 +1,93 @@
+periodics:
+- cron: "05 15-23 * * 1-5"  # Run at 7:05-15:05 PST (15:05 UTC) Mon-Fri
+  name: ci-oss-test-infra-autobump-prow
+  cluster: build
+  decorate: true
+  extra_refs:
+  - org: CiscoAI
+    repo: kubeflow-test-infra
+    base_ref: master
+  spec:
+    containers:
+    - image: gcr.io/k8s-prow/autobump:v20191217-2b88bfc4b
+      command:
+      - /autobump.sh
+      args:
+      - /etc/github-token/oauth
+      - "CiscoAI Prow Bot"
+      - ciscoai-prowbot@gmail.com
+      volumeMounts:
+      - name: github
+        mountPath: /etc/github-token
+        readOnly: true
+      env:
+      - name: GH_ORG
+        value: CiscoAI
+      - name: GH_REPO
+        value: kubeflow-test-infra
+      - name: PLANK_DEPLOYMENT_FILE
+        value: prow/cluster/cluster.yaml
+      - name: COMPONENT_FILE_DIR
+        value: prow/cluster
+      - name: CONFIG_PATH
+        value: prow/config.yaml
+      - name: JOB_CONFIG_PATH
+        value: prow/prowjobs
+    volumes:
+    - name: github
+      secret:
+        secretName: oauth-token
+
+presubmits:
+  CiscoAI/kubeflow-test-infra:
+  - name: prow-config-validate
+    cluster: build
+    interval: 30m # Retest at most 1 PR per 30m
+    decorate: true
+    always_run: true
+    max_concurrency: 2
+    rerun_command: "/test test-presubmit"
+    trigger: "(?m)^/test( all| test-presubmit),?(\\s+|$)"
+    branches:
+    - master
+    spec:
+      containers:
+      - image: gcr.io/k8s-prow/checkconfig:v20191217-2b88bfc4b
+        imagePullPolicy: Always
+        command:
+          - /checkconfig
+        args:
+          - --config-path=./prow/config.yaml
+          - --job-config-path=./prow/prowjobs
+          - --plugin-config=prow/plugins.yaml
+          - --strict
+          - --exclude-warning=mismatched-tide
+          - --exclude-warning=non-decorated-jobs
+  - name: pull-test-infra-go-test
+    branches:
+      - master
+    decorate: true
+    always_run: true
+    spec:
+      containers:
+        - image: golang:1.13
+          command:
+            - go
+            - test
+            - ./...
+  - name: pull-kubeflow-test-infra-check-config
+    run_if_changed: '^(prow/prowjobs/.*\.yaml)$'
+    decorate: true
+    optional: true
+    branches:
+    - master
+    spec:
+      containers:
+      - image: gcr.io/k8s-prow/transfigure:v20191217-2b88bfc4b
+        command:
+        - /transfigure.sh
+        args:
+        - test
+        - prow/config.yaml
+        - prow/prowjobs
+        - CiscoAI

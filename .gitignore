@@ -1,3 +1,4 @@
+.vscode/
 certs/
 istio-1.4.0/
 gcs_config/

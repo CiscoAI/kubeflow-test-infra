@@ -21,7 +21,9 @@ config_updater:
 
 plugins:
   CiscoAI:
-  # Enable /approve and /assign commands.
+    # config-updater
+    - config-updater
+    # Enable /approve and /assign commands.
     - approve
     - assign
     - blunderbuss
