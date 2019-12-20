@@ -85,7 +85,17 @@ presets:
     - name: https-proxy
       mountPath: /etc/https-proxy
       readOnly: true
-
+  - labels:
+      preset-service-account: "true"
+    volumes:
+    - name: gcp-service-account
+      secret:
+        seretName: cpsg-svc-account
+        defaultMode: 420
+    volumeMounts:
+    - name: gcp-service-account
+      mountPath: /etc/gcp
+      readOnly: true
 presubmits:
   CiscoAI/kubeflow-test-infra:
   - name: prow-config-validate
@@ -93,11 +103,11 @@ presubmits:
     interval: 30m # Retest at most 1 PR per 30m
     decorate: true
     always_run: true
-    max_concurrency: 2
+    max_concurrency: 5
     rerun_command: "/test test-presubmit"
     trigger: "(?m)^/test( all| test-presubmit),?(\\s+|$)"
     branches:
-    - master
+    - ^master$
     spec:
       containers:
       - image: gcr.io/k8s-prow/checkconfig:v20191217-2b88bfc4b
@@ -111,3 +121,26 @@ presubmits:
           - --strict
           - --exclude-warning=mismatched-tide
           - --exclude-warning=non-decorated-jobs
+  CiscoAI/kubeflow-scanner:
+  - name: presubmit-scanner
+    cluster: build
+    interval: 30m # Retest at most 1 PR per 30m
+    decorate: true
+    always_run: true
+    labels:      
+      preset-service-account: "true"
+    max_concurrency: 5
+    rerun_command: "/test scanner-presubmit"
+    trigger: "(?m)^/test( all| scanner-presubmit),?(\\s+|$)"
+    branches:
+    - ^master$
+    spec:
+      containers:
+      - image: ciscoai/kubeflow-scanner-ci:latest
+        imagePullPolicy: Always
+        command:
+          - /scanr
+        args:
+          - image
+          - --project=cpsg-ai-kubeflow
+          - --image=gcr.io/cpsg-ai-kubeflow/hello-world:0.1
