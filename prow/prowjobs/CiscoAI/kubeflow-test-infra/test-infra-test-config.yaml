@@ -1,6 +1,6 @@
 periodics:
 - cron: "05 15-23 * * 1-5"  # Run at 7:05-15:05 PST (15:05 UTC) Mon-Fri
-  name: ci-oss-test-infra-autobump-prow
+  name: ci-kubeflow-test-infra-autobump-prow
   cluster: build
   decorate: true
   extra_refs:
@@ -63,31 +63,4 @@ presubmits:
           - --strict
           - --exclude-warning=mismatched-tide
           - --exclude-warning=non-decorated-jobs
-  - name: pull-test-infra-go-test
-    branches:
-      - master
-    decorate: true
-    always_run: true
-    spec:
-      containers:
-        - image: golang:1.13
-          command:
-            - go
-            - test
-            - ./...
-  - name: pull-kubeflow-test-infra-check-config
-    run_if_changed: '^(prow/prowjobs/.*\.yaml)$'
-    decorate: true
-    optional: true
-    branches:
-    - master
-    spec:
-      containers:
-      - image: gcr.io/k8s-prow/transfigure:v20191217-2b88bfc4b
-        command:
-        - /transfigure.sh
-        args:
-        - test
-        - prow/config.yaml
-        - prow/prowjobs
-        - CiscoAI
+

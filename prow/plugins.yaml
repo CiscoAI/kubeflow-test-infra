@@ -5,11 +5,8 @@ triggers:
   - CiscoAI/kubeflow-test-infra
   - CiscoAI/kubeflow-scanner
   only_org_members: true
-
 blunderbuss:
   request_count: 1
-
-
 config_updater:
   maps:
     prow/config.yaml:
@@ -18,11 +15,8 @@ config_updater:
       name: plugins
     prow/prowjobs/**/*.yaml:
       name: job-config
-
 plugins:
   CiscoAI:
-    # config-updater
-    - config-updater
     # Enable /approve and /assign commands.
     - approve
     - assign
@@ -48,4 +42,5 @@ plugins:
   CiscoAI/kubeflow:
     - trigger
   CiscoAI/kubeflow-test-infra:
+    - config-updater
     - trigger
