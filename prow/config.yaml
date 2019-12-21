@@ -90,7 +90,7 @@ presets:
     volumes:
     - name: gcp-service-account
       secret:
-        seretName: cpsg-svc-account
+        secretName: cpsg-svc-account
         defaultMode: 420
     volumeMounts:
     - name: gcp-service-account
@@ -99,8 +99,7 @@ presets:
 presubmits:
   CiscoAI/kubeflow-test-infra:
   - name: prow-config-validate
-    cluster: build
-    interval: 30m # Retest at most 1 PR per 30m
+    #cluster: build
     decorate: true
     always_run: true
     max_concurrency: 5
@@ -123,8 +122,7 @@ presubmits:
           - --exclude-warning=non-decorated-jobs
   CiscoAI/kubeflow-scanner:
   - name: presubmit-scanner
-    cluster: build
-    interval: 30m # Retest at most 1 PR per 30m
+    #cluster: build
     decorate: true
     always_run: true
     labels:      
