@@ -1,23 +1,24 @@
 presubmits:
-  CiscoAI/kubeflow-scanner:
-  - name: presubmit-scanner
+  CiscoAI/kubeflow-test-infra:
+  - name: prow-config-validate
     #cluster: build
     decorate: true
     always_run: true
-    labels:      
-      preset-service-account: "true"
     max_concurrency: 5
-    rerun_command: "/test scanner-presubmit"
-    trigger: "(?m)^/test( all| scanner-presubmit),?(\\s+|$)"
+    rerun_command: "/test test-presubmit"
+    trigger: "(?m)^/test( all| test-presubmit),?(\\s+|$)"
     branches:
     - ^master$
     spec:
       containers:
-      - image: ciscoai/kubeflow-scanner-ci:latest
+      - image: gcr.io/k8s-prow/checkconfig:v20191217-2b88bfc4b
         imagePullPolicy: Always
         command:
-          - /scanr
+          - /checkconfig
         args:
-          - image
-          - --project=cpsg-ai-kubeflow
-          - --image=gcr.io/cpsg-ai-kubeflow/hello-world:0.1
+          - --config-path=./prow/config.yaml
+          - --job-config-path=./prow/prowjobs
+          - --plugin-config=prow/plugins.yaml
+          - --strict
+          - --exclude-warning=mismatched-tide
+          - --exclude-warning=non-decorated-jobs
