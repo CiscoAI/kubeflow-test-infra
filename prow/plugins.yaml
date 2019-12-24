@@ -1,12 +1,6 @@
----
-triggers:
-- repos:
-  - CiscoAI/kubeflow
-  - CiscoAI/kubeflow-test-infra
-  - CiscoAI/kubeflow-scanner
-  only_org_members: true
 blunderbuss:
   request_count: 1
+
 config_updater:
   maps:
     prow/config.yaml:
@@ -15,32 +9,33 @@ config_updater:
       name: plugins
     prow/prowjobs/**/*.yaml:
       name: job-config
+
 plugins:
   CiscoAI:
-    # Enable /approve and /assign commands.
-    - approve
-    - assign
-    - blunderbuss
-    - help
-    - hold
-    - label
-    - lgtm
-    # Lets PRs & issues be flagged as stale
-    - lifecycle
-    - size
-    # Allows cleaning up stale commit statuses
-    - skip
-    - verify-owners
-    # Applies a label to PRs with wip in the title to block merge
-    - wip
+  - approve
+  - assign
+  - cat
+  - dog
+  - golint
+  - hold
+  - label
+  - lgtm
+  - owners-label
+  - pony
+  - shrug
+  - size
+  - trigger
+  - verify-owners
+  - yuks
+
   CiscoAI/kubeflow-scanner:
-    - trigger
-    - goose
-    - shrug
-    - dog
-    - cat
+  - goose
+
   CiscoAI/kubeflow:
-    - trigger
+  - goose
+
   CiscoAI/kubeflow-test-infra:
-    - config-updater
-    - trigger
+  - config-updater
+  
+  https://kunit-review.googlesource.com/linux:
+  - trigger
