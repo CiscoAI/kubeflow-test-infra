@@ -1,7 +1,7 @@
 periodics:
 - cron: "05 15-23 * * 1-5"  # Run at 7:05-15:05 PST (15:05 UTC) Mon-Fri
   name: ci-kubeflow-test-infra-autobump-prow
-  cluster: build
+  #cluster: build
   decorate: true
   extra_refs:
   - org: CiscoAI
