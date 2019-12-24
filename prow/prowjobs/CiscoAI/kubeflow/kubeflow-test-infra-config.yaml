@@ -1,15 +1,23 @@
-# periodics:
-
-# - name: kubeflow-periodic-0-7-branch
-#   branches:
-#   - v0.7-branch
-#   cluster: build
-#   interval: 8h
-#   decorate: true
-#   always_run: true
-#   max_concurrency: 2
-#   spec:
-#     containers:
-#     - image: ciscoai/kubeflow-ci:latest
-#       imagePullPolicy: Always
-# presubmits:
+presubmits:
+  CiscoAI/kubeflow-scanner:
+  - name: presubmit-scanner
+    #cluster: build
+    decorate: true
+    always_run: true
+    labels:      
+      preset-service-account: "true"
+    max_concurrency: 5
+    rerun_command: "/test scanner-presubmit"
+    trigger: "(?m)^/test( all| scanner-presubmit),?(\\s+|$)"
+    branches:
+    - ^master$
+    spec:
+      containers:
+      - image: ciscoai/kubeflow-scanner-ci:latest
+        imagePullPolicy: Always
+        command:
+          - /scanr
+        args:
+          - image
+          - --project=cpsg-ai-kubeflow
+          - --image=gcr.io/cpsg-ai-kubeflow/hello-world:0.1
